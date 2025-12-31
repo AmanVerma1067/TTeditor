@@ -1,7 +1,9 @@
 import { useDrop } from 'react-dnd';
 import { cn } from '@/lib/utils';
-import { Plus } from 'lucide-react';
+import { Plus, ClipboardPaste } from 'lucide-react';
 import type { ClassBlock, Day } from '@/types/timetable';
+import { useTimetableStore } from '@/stores/useTimetableStore';
+import { toast } from '@/hooks/use-toast';
 
 interface GridCellProps {
   day: Day;
@@ -20,6 +22,9 @@ export function GridCell({
   onDrop,
   onClick,
 }: GridCellProps) {
+  const clipboard = useTimetableStore((state) => state.clipboard);
+  const pasteClassBlock = useTimetableStore((state) => state.pasteClassBlock);
+
   const [{ isOver, canDrop }, drop] = useDrop(
     () => ({
       accept: 'CLASS_BLOCK',
@@ -36,6 +41,24 @@ export function GridCell({
   );
 
   const isEmpty = !children && !isOccupiedByPrevious;
+  const hasClipboard = clipboard !== null;
+
+  const handlePaste = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    const conflict = pasteClassBlock(day, slotIndex);
+    if (conflict) {
+      toast({
+        title: 'Paste Failed',
+        description: conflict.message,
+        variant: 'destructive',
+      });
+    } else {
+      toast({
+        title: 'Class Pasted',
+        description: `${clipboard?.subject} added to ${day}`,
+      });
+    }
+  };
 
   return (
     <div
@@ -52,12 +75,21 @@ export function GridCell({
     >
       {children}
       
-      {/* Empty cell add button */}
+      {/* Empty cell actions */}
       {isEmpty && (
-        <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+        <div className="absolute inset-0 flex items-center justify-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
           <div className="flex items-center justify-center w-8 h-8 rounded-full bg-primary/10 text-primary">
             <Plus className="h-4 w-4" />
           </div>
+          {hasClipboard && (
+            <button
+              onClick={handlePaste}
+              className="flex items-center justify-center w-8 h-8 rounded-full bg-accent text-accent-foreground hover:bg-accent/80 transition-colors"
+              title="Paste copied class"
+            >
+              <ClipboardPaste className="h-4 w-4" />
+            </button>
+          )}
         </div>
       )}
 
