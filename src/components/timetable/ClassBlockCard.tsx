@@ -1,7 +1,9 @@
 import { useDrag } from 'react-dnd';
 import { cn } from '@/lib/utils';
 import type { ClassBlock, ClassType } from '@/types/timetable';
-import { GripVertical, Clock, MapPin, User } from 'lucide-react';
+import { GripVertical, Clock, MapPin, User, Copy } from 'lucide-react';
+import { useTimetableStore } from '@/stores/useTimetableStore';
+import { toast } from '@/hooks/use-toast';
 
 interface ClassBlockCardProps {
   block: ClassBlock;
@@ -36,6 +38,8 @@ const typeLabels: Record<ClassType, string> = {
 };
 
 export function ClassBlockCard({ block, onClick }: ClassBlockCardProps) {
+  const copyClassBlock = useTimetableStore((state) => state.copyClassBlock);
+  
   const [{ isDragging }, drag, preview] = useDrag(
     () => ({
       type: 'CLASS_BLOCK',
@@ -46,6 +50,15 @@ export function ClassBlockCard({ block, onClick }: ClassBlockCardProps) {
     }),
     [block]
   );
+
+  const handleCopy = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    copyClassBlock(block);
+    toast({
+      title: 'Class Copied',
+      description: `${block.subject} copied to clipboard. Click an empty slot to paste.`,
+    });
+  };
 
   const styles = typeStyles[block.type];
   const isLab = block.duration === 2;
@@ -64,12 +77,21 @@ export function ClassBlockCard({ block, onClick }: ClassBlockCardProps) {
         isLab && 'min-h-[120px]'
       )}
     >
-      {/* Drag handle */}
-      <div
-        ref={drag}
-        className="absolute top-1 right-1 p-1 rounded opacity-0 group-hover:opacity-100 transition-opacity cursor-grab active:cursor-grabbing hover:bg-foreground/5"
-      >
-        <GripVertical className="h-3.5 w-3.5 text-muted-foreground" />
+      {/* Action buttons */}
+      <div className="absolute top-1 right-1 flex items-center gap-0.5 opacity-0 group-hover:opacity-100 transition-opacity">
+        <button
+          onClick={handleCopy}
+          className="p-1 rounded hover:bg-foreground/10 transition-colors"
+          title="Copy class"
+        >
+          <Copy className="h-3.5 w-3.5 text-muted-foreground" />
+        </button>
+        <div
+          ref={drag}
+          className="p-1 rounded cursor-grab active:cursor-grabbing hover:bg-foreground/5"
+        >
+          <GripVertical className="h-3.5 w-3.5 text-muted-foreground" />
+        </div>
       </div>
 
       {/* Type badge */}
