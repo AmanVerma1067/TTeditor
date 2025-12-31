@@ -229,7 +229,3 @@ MIT License - feel free to use this project for your own purposes.
 3. Commit changes (`git commit -m 'Add amazing feature'`)
 4. Push to branch (`git push origin feature/amazing-feature`)
 5. Open a Pull Request
-
----
-
-Built with ❤️ using [Lovable](https://lovable.dev)
