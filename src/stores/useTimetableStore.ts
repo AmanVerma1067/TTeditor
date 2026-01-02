@@ -25,6 +25,7 @@ interface TimetableStore {
   isSaving: boolean;
   error: string | null;
   hasUnsavedChanges: boolean;
+  clipboard: Omit<ClassBlock, 'id' | 'day' | 'slotIndex'> | null;
 
   // Actions
   setBatch: (batch: BatchID) => void;
@@ -32,6 +33,8 @@ interface TimetableStore {
   addClassBlock: (block: Omit<ClassBlock, 'id'>) => ConflictError | null;
   updateClassBlock: (id: string, updates: Partial<ClassBlock>) => ConflictError | null;
   removeClassBlock: (id: string) => void;
+  copyClassBlock: (block: ClassBlock) => void;
+  pasteClassBlock: (day: Day, slotIndex: number) => ConflictError | null;
   moveClassBlock: (id: string, newDay: Day, newSlotIndex: number) => ConflictError | null;
   
   // Conflict detection
@@ -105,6 +108,7 @@ export const useTimetableStore = create<TimetableStore>((set, get) => ({
   isSaving: false,
   error: null,
   hasUnsavedChanges: false,
+  clipboard: null,
 
   setBatch: (batch) => {
     set({ batch, hasUnsavedChanges: false });
@@ -200,6 +204,19 @@ export const useTimetableStore = create<TimetableStore>((set, get) => ({
       
       return { grid: newGrid, hasUnsavedChanges: true };
     });
+  },
+
+  copyClassBlock: (block) => {
+    const { subject, type, room, faculty, duration } = block;
+    set({ clipboard: { subject, type, room, faculty, duration } });
+  },
+
+  pasteClassBlock: (day, slotIndex) => {
+    const { clipboard } = get();
+    if (!clipboard) {
+      return { type: 'logic', message: 'No class copied to clipboard' };
+    }
+    return get().addClassBlock({ ...clipboard, day, slotIndex });
   },
 
   moveClassBlock: (id, newDay, newSlotIndex) => {
@@ -357,31 +374,28 @@ export const useTimetableStore = create<TimetableStore>((set, get) => ({
       Saturday: [],
     };
 
-    const allBlocks = get().getAllClassBlocks();
-    
-    for (const block of allBlocks) {
-      const startSlot = TimeSlotsList[block.slotIndex];
-      const endSlot = TimeSlotsList[block.slotIndex + block.duration - 1];
-      
-      const entry: FlutterClassEntry = {
-        time: `${startSlot.start}-${endSlot.end}`,
-        subject: `${block.type}-${block.subject.replace(/^[LPT]-/, '')}`,
-        room: block.room,
-        teacher: block.faculty,
-      };
-      
-      result[block.day].push(entry);
+    // Iterate through grid in slot order (maintains timetable order)
+    for (let slotIndex = 0; slotIndex < TimeSlotsList.length; slotIndex++) {
+      for (let dayIndex = 0; dayIndex < DaysList.length; dayIndex++) {
+        const cell = grid[slotIndex][dayIndex];
+        if (!cell.classBlock) continue;
+        
+        const block = cell.classBlock;
+        const startSlot = TimeSlotsList[block.slotIndex];
+        const endSlot = TimeSlotsList[block.slotIndex + block.duration - 1];
+        
+        const entry: FlutterClassEntry = {
+          time: `${startSlot.start}-${endSlot.end}`,
+          subject: `${block.type}-${block.subject.replace(/^[LPT]-/, '')}`,
+          room: block.room,
+          teacher: block.faculty,
+        };
+        
+        result[block.day].push(entry);
+      }
     }
 
-    // Sort by time
-    for (const day of DaysList) {
-      result[day].sort((a, b) => {
-        const aTime = parseInt(a.time.split(':')[0]);
-        const bTime = parseInt(b.time.split(':')[0]);
-        return aTime - bTime;
-      });
-    }
-
+    // Already in slot order, no sorting needed
     return result;
   },
 

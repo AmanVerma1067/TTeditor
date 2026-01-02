@@ -2,136 +2,139 @@
 @tailwind components;
 @tailwind utilities;
 
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap');
 
 @layer base {
   :root {
-    /* Base colors - Slate professional theme */
-    --background: 210 20% 98%;
-    --foreground: 222 47% 11%;
+    /* Vibrant modern theme */
+    --background: 240 20% 99%;
+    --foreground: 240 10% 10%;
 
     --card: 0 0% 100%;
-    --card-foreground: 222 47% 11%;
+    --card-foreground: 240 10% 10%;
 
     --popover: 0 0% 100%;
-    --popover-foreground: 222 47% 11%;
+    --popover-foreground: 240 10% 10%;
 
-    --primary: 222 47% 11%;
-    --primary-foreground: 210 40% 98%;
+    --primary: 250 91% 60%;
+    --primary-foreground: 0 0% 100%;
 
-    --secondary: 210 40% 96%;
-    --secondary-foreground: 222 47% 11%;
+    --secondary: 240 10% 96%;
+    --secondary-foreground: 240 10% 10%;
 
-    --muted: 210 40% 96%;
-    --muted-foreground: 215 16% 47%;
+    --muted: 240 10% 96%;
+    --muted-foreground: 240 5% 46%;
 
-    --accent: 210 40% 96%;
-    --accent-foreground: 222 47% 11%;
+    --accent: 330 90% 60%;
+    --accent-foreground: 0 0% 100%;
 
     --destructive: 0 84% 60%;
-    --destructive-foreground: 210 40% 98%;
+    --destructive-foreground: 0 0% 100%;
 
-    --border: 214 32% 91%;
-    --input: 214 32% 91%;
-    --ring: 222 47% 11%;
+    --border: 240 10% 90%;
+    --input: 240 10% 90%;
+    --ring: 250 91% 60%;
 
-    --radius: 0.5rem;
+    --radius: 0.75rem;
 
-    /* Class type colors */
-    --lecture: 217 91% 60%;
-    --lecture-bg: 217 91% 95%;
-    --lecture-border: 217 91% 85%;
+    /* Class type colors - Vibrant */
+    --lecture: 220 95% 55%;
+    --lecture-bg: 220 100% 96%;
+    --lecture-border: 220 95% 75%;
 
-    --lab: 0 84% 60%;
-    --lab-bg: 0 84% 95%;
-    --lab-border: 0 84% 85%;
+    --lab: 350 95% 55%;
+    --lab-bg: 350 100% 96%;
+    --lab-border: 350 95% 75%;
 
-    --tutorial: 45 93% 47%;
-    --tutorial-bg: 45 93% 92%;
-    --tutorial-border: 45 93% 75%;
+    --tutorial: 45 100% 50%;
+    --tutorial-bg: 45 100% 93%;
+    --tutorial-border: 45 100% 65%;
 
     /* Status colors */
-    --success: 142 76% 36%;
-    --success-bg: 142 76% 95%;
-    --warning: 38 92% 50%;
-    --warning-bg: 38 92% 95%;
+    --success: 160 84% 40%;
+    --success-bg: 160 84% 95%;
+    --warning: 38 100% 50%;
+    --warning-bg: 38 100% 95%;
     --error: 0 84% 60%;
     --error-bg: 0 84% 95%;
 
     /* Grid colors */
-    --grid-header: 215 28% 17%;
-    --grid-header-foreground: 210 40% 98%;
+    --grid-header: 250 60% 35%;
+    --grid-header-foreground: 0 0% 100%;
     --grid-cell: 0 0% 100%;
-    --grid-cell-hover: 210 40% 98%;
-    --grid-border: 214 32% 91%;
+    --grid-cell-hover: 250 50% 98%;
+    --grid-border: 240 10% 88%;
 
     /* Shadows */
-    --shadow-sm: 0 1px 2px 0 hsl(222 47% 11% / 0.05);
-    --shadow-md: 0 4px 6px -1px hsl(222 47% 11% / 0.1), 0 2px 4px -2px hsl(222 47% 11% / 0.1);
-    --shadow-lg: 0 10px 15px -3px hsl(222 47% 11% / 0.1), 0 4px 6px -4px hsl(222 47% 11% / 0.1);
-    --shadow-block: 0 1px 3px 0 hsl(222 47% 11% / 0.1), 0 1px 2px -1px hsl(222 47% 11% / 0.1);
+    --shadow-sm: 0 1px 3px 0 hsl(250 50% 30% / 0.05);
+    --shadow-md: 0 4px 12px -2px hsl(250 50% 30% / 0.12), 0 2px 6px -2px hsl(250 50% 30% / 0.08);
+    --shadow-lg: 0 12px 28px -4px hsl(250 50% 30% / 0.15), 0 6px 12px -4px hsl(250 50% 30% / 0.1);
+    --shadow-block: 0 2px 8px 0 hsl(250 50% 30% / 0.1), 0 1px 3px -1px hsl(250 50% 30% / 0.08);
 
     --sidebar-background: 0 0% 98%;
     --sidebar-foreground: 240 5.3% 26.1%;
-    --sidebar-primary: 240 5.9% 10%;
-    --sidebar-primary-foreground: 0 0% 98%;
+    --sidebar-primary: 250 91% 60%;
+    --sidebar-primary-foreground: 0 0% 100%;
     --sidebar-accent: 240 4.8% 95.9%;
     --sidebar-accent-foreground: 240 5.9% 10%;
     --sidebar-border: 220 13% 91%;
-    --sidebar-ring: 217.2 91.2% 59.8%;
+    --sidebar-ring: 250 91% 60%;
   }
 
   .dark {
-    --background: 222 47% 6%;
-    --foreground: 210 40% 98%;
+    --background: 240 15% 8%;
+    --foreground: 0 0% 98%;
 
-    --card: 222 47% 9%;
-    --card-foreground: 210 40% 98%;
+    --card: 240 15% 11%;
+    --card-foreground: 0 0% 98%;
 
-    --popover: 222 47% 9%;
-    --popover-foreground: 210 40% 98%;
+    --popover: 240 15% 11%;
+    --popover-foreground: 0 0% 98%;
 
-    --primary: 210 40% 98%;
-    --primary-foreground: 222 47% 11%;
+    --primary: 250 91% 65%;
+    --primary-foreground: 240 15% 8%;
 
-    --secondary: 217 33% 17%;
-    --secondary-foreground: 210 40% 98%;
+    --secondary: 240 12% 18%;
+    --secondary-foreground: 0 0% 98%;
 
-    --muted: 217 33% 17%;
-    --muted-foreground: 215 20% 65%;
+    --muted: 240 12% 18%;
+    --muted-foreground: 240 5% 65%;
 
-    --accent: 217 33% 17%;
-    --accent-foreground: 210 40% 98%;
+    --accent: 330 90% 65%;
+    --accent-foreground: 0 0% 100%;
 
-    --destructive: 0 63% 31%;
-    --destructive-foreground: 210 40% 98%;
+    --destructive: 0 72% 50%;
+    --destructive-foreground: 0 0% 100%;
 
-    --border: 217 33% 17%;
-    --input: 217 33% 17%;
-    --ring: 212 27% 84%;
+    --border: 240 12% 20%;
+    --input: 240 12% 20%;
+    --ring: 250 91% 65%;
 
-    --lecture-bg: 217 91% 15%;
-    --lecture-border: 217 91% 35%;
+    --lecture: 220 95% 65%;
+    --lecture-bg: 220 60% 18%;
+    --lecture-border: 220 80% 40%;
 
-    --lab-bg: 0 84% 15%;
-    --lab-border: 0 84% 35%;
+    --lab: 350 95% 60%;
+    --lab-bg: 350 60% 18%;
+    --lab-border: 350 80% 40%;
 
-    --tutorial-bg: 45 93% 15%;
-    --tutorial-border: 45 93% 35%;
+    --tutorial: 45 100% 55%;
+    --tutorial-bg: 45 50% 18%;
+    --tutorial-border: 45 80% 40%;
 
-    --grid-header: 217 33% 12%;
-    --grid-cell: 222 47% 9%;
-    --grid-cell-hover: 217 33% 12%;
-    --grid-border: 217 33% 17%;
+    --grid-header: 250 50% 18%;
+    --grid-cell: 240 15% 11%;
+    --grid-cell-hover: 250 40% 16%;
+    --grid-border: 240 12% 22%;
 
-    --sidebar-background: 240 5.9% 10%;
-    --sidebar-foreground: 240 4.8% 95.9%;
-    --sidebar-primary: 224.3 76.3% 48%;
+    --sidebar-background: 240 15% 10%;
+    --sidebar-foreground: 0 0% 98%;
+    --sidebar-primary: 250 91% 65%;
     --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 240 3.7% 15.9%;
-    --sidebar-accent-foreground: 240 4.8% 95.9%;
-    --sidebar-border: 240 3.7% 15.9%;
-    --sidebar-ring: 217.2 91.2% 59.8%;
+    --sidebar-accent: 240 10% 16%;
+    --sidebar-accent-foreground: 0 0% 98%;
+    --sidebar-border: 240 10% 18%;
+    --sidebar-ring: 250 91% 65%;
   }
 }
 
@@ -188,10 +191,19 @@
 
 @keyframes pulse-glow {
   0%, 100% {
-    box-shadow: 0 0 0 0 hsl(var(--primary) / 0.2);
+    box-shadow: 0 0 0 0 hsl(var(--primary) / 0.3);
   }
   50% {
-    box-shadow: 0 0 0 4px hsl(var(--primary) / 0.1);
+    box-shadow: 0 0 0 8px hsl(var(--primary) / 0.1);
+  }
+}
+
+@keyframes shimmer {
+  0% {
+    background-position: -200% 0;
+  }
+  100% {
+    background-position: 200% 0;
   }
 }
 
@@ -211,6 +223,12 @@
   animation: pulse-glow 2s ease-in-out infinite;
 }
 
+.animate-shimmer {
+  animation: shimmer 2s ease-in-out infinite;
+  background: linear-gradient(90deg, transparent, hsl(var(--primary) / 0.1), transparent);
+  background-size: 200% 100%;
+}
+
 /* Drag and drop styles */
 .dragging {
   opacity: 0.5;
@@ -218,13 +236,28 @@
 }
 
 .drop-target {
-  background-color: hsl(var(--primary) / 0.05);
-  border: 2px dashed hsl(var(--primary) / 0.3);
+  background-color: hsl(var(--primary) / 0.08);
+  border: 2px dashed hsl(var(--primary) / 0.4);
 }
 
 .drop-target-active {
-  background-color: hsl(var(--primary) / 0.1);
-  border-color: hsl(var(--primary) / 0.5);
+  background-color: hsl(var(--primary) / 0.15);
+  border-color: hsl(var(--primary) / 0.6);
+}
+
+/* Gradient text utility */
+.text-gradient {
+  background: linear-gradient(135deg, hsl(var(--primary)), hsl(var(--accent)));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* Glass effect */
+.glass {
+  background: hsl(var(--background) / 0.7);
+  backdrop-filter: blur(12px);
+  border: 1px solid hsl(var(--border) / 0.5);
 }
 
 /* Custom scrollbar */

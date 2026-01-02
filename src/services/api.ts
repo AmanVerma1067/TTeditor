@@ -116,12 +116,17 @@ export const convertApiToGrid = (
         subject = subject.substring(2);
       }
 
-      // Calculate duration from time range
+      // Labs (P) default to 2 slots, otherwise calculate from time range
+      let duration: 1 | 2 = type === 'P' ? 2 : 1;
+      
+      // Override with time range if provided
       const timeEndMatch = entry.time.match(/-(\d{1,2}):(\d{2})/);
-      let duration: 1 | 2 = 1;
       if (timeEndMatch) {
         const endHour = parseInt(timeEndMatch[1]);
-        const diff = endHour - hour;
+        // Convert to 24-hour for comparison
+        const startHour24 = hour < 8 ? hour + 12 : hour;
+        const endHour24 = endHour < 8 ? endHour + 12 : endHour;
+        const diff = endHour24 - startHour24;
         duration = diff >= 2 ? 2 : 1;
       }
 

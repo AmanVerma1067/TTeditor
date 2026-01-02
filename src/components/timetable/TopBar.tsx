@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useTimetableStore } from '@/stores/useTimetableStore';
 import { timetableApi, convertApiToGrid } from '@/services/api';
 import { Button } from '@/components/ui/button';
@@ -25,13 +25,17 @@ import {
   AlertCircle,
   RefreshCw,
   CheckCircle2,
-  XCircle
+  XCircle,
+  Upload
 } from 'lucide-react';
 import { toast } from '@/hooks/use-toast';
-import type { BatchID } from '@/types/timetable';
+import type { BatchID, Day, ClassBlock, FlutterExportFormat } from '@/types/timetable';
+import { TIME_SLOTS as TimeSlotsList, DAYS as DaysList } from '@/types/timetable';
+import { v4 as uuidv4 } from 'uuid';
 
 export function TopBar() {
   const [apiStatus, setApiStatus] = useState<'checking' | 'online' | 'offline'>('checking');
+  const fileInputRef = useRef<HTMLInputElement>(null);
   
   const {
     batch,
@@ -128,6 +132,126 @@ export function TopBar() {
       title: 'Export Complete',
       description: `Timetable exported as timetable-${batch}-flutter.json`,
     });
+  };
+
+  const handleImport = () => {
+    fileInputRef.current?.click();
+  };
+
+  const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      try {
+        const content = e.target?.result as string;
+        const data = JSON.parse(content) as FlutterExportFormat;
+        
+        // Validate structure
+        if (!data.batch || !DaysList.some(day => Array.isArray(data[day]))) {
+          throw new Error('Invalid timetable format');
+        }
+
+        // Convert imported data to grid format
+        const grid = TimeSlotsList.map((_, slotIndex) =>
+          DaysList.map((day) => ({
+            day,
+            slotIndex,
+            classBlock: null as ClassBlock | null,
+            isOccupiedByPrevious: false,
+          }))
+        );
+
+        // Parse each day's classes
+        for (const day of DaysList) {
+          const dayData = data[day] || [];
+          const dayIndex = DaysList.indexOf(day);
+
+          for (const entry of dayData) {
+            // Parse time to find slot index
+            const timeMatch = entry.time.match(/^(\d{1,2}):(\d{2})/);
+            if (!timeMatch) continue;
+
+            const hour = parseInt(timeMatch[1]);
+            const slotIndex = TimeSlotsList.findIndex((slot) => {
+              const slotHour = parseInt(slot.start.split(':')[0]);
+              return slotHour === hour;
+            });
+
+            if (slotIndex === -1) continue;
+
+            // Determine type from subject prefix
+            let type: 'L' | 'P' | 'T' = 'L';
+            let subject = entry.subject;
+            
+            if (subject.startsWith('P-')) {
+              type = 'P';
+              subject = subject.substring(2);
+            } else if (subject.startsWith('L-')) {
+              type = 'L';
+              subject = subject.substring(2);
+            } else if (subject.startsWith('T-')) {
+              type = 'T';
+              subject = subject.substring(2);
+            }
+
+            // Labs default to 2 slots
+            let duration: 1 | 2 = type === 'P' ? 2 : 1;
+            
+            // Override with time range if provided
+            const timeEndMatch = entry.time.match(/-(\d{1,2}):(\d{2})/);
+            if (timeEndMatch) {
+              const endHour = parseInt(timeEndMatch[1]);
+              const startHour24 = hour < 8 ? hour + 12 : hour;
+              const endHour24 = endHour < 8 ? endHour + 12 : endHour;
+              const diff = endHour24 - startHour24;
+              duration = diff >= 2 ? 2 : 1;
+            }
+
+            const block: ClassBlock = {
+              id: uuidv4(),
+              subject: `${type}-${subject}`,
+              type,
+              room: entry.room,
+              faculty: entry.teacher,
+              duration,
+              day,
+              slotIndex,
+            };
+
+            grid[slotIndex][dayIndex].classBlock = block;
+
+            // Mark next slot as occupied for labs
+            if (duration === 2 && slotIndex < 7) {
+              grid[slotIndex + 1][dayIndex].isOccupiedByPrevious = true;
+            }
+          }
+        }
+
+        // Update store
+        useTimetableStore.setState({ 
+          grid, 
+          batch: data.batch as BatchID,
+          hasUnsavedChanges: true 
+        });
+        
+        toast({
+          title: 'Import Successful',
+          description: `Loaded timetable for batch ${data.batch}`,
+        });
+      } catch (error) {
+        toast({
+          title: 'Import Failed',
+          description: error instanceof Error ? error.message : 'Invalid JSON file',
+          variant: 'destructive',
+        });
+      }
+    };
+    
+    reader.readAsText(file);
+    // Reset input so same file can be selected again
+    event.target.value = '';
   };
 
   return (
@@ -258,12 +382,30 @@ export function TopBar() {
             </Tooltip>
           </div>
 
+          {/* Import */}
+          <input
+            type="file"
+            ref={fileInputRef}
+            onChange={handleFileChange}
+            accept=".json"
+            className="hidden"
+          />
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <Button variant="outline" onClick={handleImport}>
+                <Upload className="h-4 w-4 mr-2" />
+                <span className="hidden sm:inline">Import</span>
+              </Button>
+            </TooltipTrigger>
+            <TooltipContent>Import JSON from file</TooltipContent>
+          </Tooltip>
+
           {/* Export */}
           <Tooltip>
             <TooltipTrigger asChild>
               <Button onClick={handleExport}>
                 <Download className="h-4 w-4 mr-2" />
-                <span className="hidden sm:inline">Export JSON</span>
+                <span className="hidden sm:inline">Export</span>
               </Button>
             </TooltipTrigger>
             <TooltipContent>Export for Flutter app</TooltipContent>
